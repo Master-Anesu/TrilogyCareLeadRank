@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💅 Trilogy Care — Slay Ranker</title>
+<style>
+  :root {
+    --bg: #FFF0F7; --bg2: #FFE4F2; --card: #FFFFFF;
+    --header-bg: #FF007F; --border: #FFB3D9;
+    --text: #4A0030; --text-muted: #C2607A; --text-bright: #FFFFFF;
+    --legendary: #FF007F; --leg-bg: #FFF0F7; --leg-alt: #FFE4F2;
+    --epic: #E91E8C; --epic-bg: #FDE8F4; --epic-alt: #FAD4EC;
+    --rare: #FF80AB; --rare-bg: #FFF5FA; --rare-alt: #FFECF5;
+    --common: #C2607A; --common-bg: #FFF8FB; --common-alt: #FFF2F7;
+    --btn-green: #FF007F; --btn-green-h: #CC0066;
+    --btn-orange: #FFD700; --btn-orange-h: #FFC200;
+    --xp-fill: #FFD700; --xp-empty: #FFB3D9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* Header */
+  .header { background: var(--header-bg); height: 62px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .header-left { display: flex; align-items: center; gap: 8px; }
+  .header-title { font-size: 20px; font-weight: bold; color: white; }
+  .header-sub { font-size: 13px; font-style: italic; color: #FFD700; }
+  .header-right { font-size: 10px; font-style: italic; color: #FFD700; }
+
+  /* Toolbar */
+  .toolbar { background: var(--bg2); padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .btn { border: none; padding: 8px 18px; font-size: 13px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+  .btn-primary { background: var(--btn-green); color: white; }
+  .btn-primary:hover { background: var(--btn-green-h); }
+  .btn-secondary { background: var(--btn-orange); color: var(--text); }
+  .btn-secondary:hover { background: var(--btn-orange-h); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .toolbar-sep { width: 1px; height: 28px; background: var(--border); }
+  .toolbar-status { font-size: 12px; color: var(--text-muted); flex: 1; }
+  .search-wrap { display: flex; align-items: center; gap: 4px; }
+  .search-wrap input { padding: 6px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background: var(--card); color: var(--text); outline: none; width: 200px; }
+  .search-wrap input:focus { border-color: var(--btn-green); }
+
+  /* Stats */
+  .stats-bar { padding: 12px 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 10px 22px; text-align: center; min-width: 100px; }
+  .stat-count { font-size: 20px; font-weight: bold; }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Table */
+  .table-wrap { padding: 0 16px; flex: 1; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 6px; overflow: hidden; }
+  thead th { background: var(--header-bg); color: white; font-size: 12px; font-weight: 600; padding: 10px 12px; text-align: left; cursor: pointer; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+  thead th:hover { background: var(--btn-green-h); }
+  thead th.sorted-asc::after { content: ' ▲'; }
+  thead th.sorted-desc::after { content: ' ▼'; }
+  tbody td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #FFE4F2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
+  tbody tr { cursor: pointer; transition: filter 0.15s; }
+  tbody tr:hover { filter: brightness(0.96); }
+  tbody tr.selected { outline: 2px solid var(--header-bg); outline-offset: -2px; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 15px; font-weight: 600; line-height: 2; }
+
+  /* Tier colors */
+  .tier-LEGENDARY { color: var(--legendary); font-weight: 700; }
+  .tier-EPIC { color: var(--epic); font-weight: 700; }
+  .tier-RARE { color: var(--rare); font-weight: 700; }
+  .tier-COMMON { color: var(--common); font-weight: 700; }
+  .row-LEGENDARY { background: var(--leg-bg); }
+  .row-LEGENDARY-alt { background: var(--leg-alt); }
+  .row-EPIC { background: var(--epic-bg); }
+  .row-EPIC-alt { background: var(--epic-alt); }
+  .row-RARE { background: var(--rare-bg); }
+  .row-RARE-alt { background: var(--rare-alt); }
+  .row-COMMON { background: var(--common-bg); }
+  .row-COMMON-alt { background: var(--common-alt); }
+
+  /* XP badge */
+  .xp-badge { display: inline-block; font-weight: 700; font-size: 13px; }
+
+  /* Detail Panel */
+  .detail-panel { margin: 6px 16px 14px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .detail-header { background: var(--header-bg); color: white; padding: 8px 14px; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .detail-body { background: var(--card); padding: 14px 16px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.7; min-height: 80px; white-space: pre-wrap; }
+  .detail-body .bar-filled { color: var(--xp-fill); }
+  .detail-body .bar-empty { color: var(--xp-empty); }
+  .detail-body .section-label { display: inline-block; width: 170px; }
+  .detail-body .section-pts { display: inline-block; width: 70px; text-align: right; }
+
+  /* Modal Overlay */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(74,0,48,0.45); z-index: 100; justify-content: center; align-items: center; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--bg2); border-radius: 10px; width: 560px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.25); }
+  .modal-header { background: var(--header-bg); color: white; padding: 16px 22px; font-size: 15px; font-weight: 700; border-radius: 10px 10px 0 0; }
+  .modal-body { padding: 20px 26px; }
+  .modal-body p { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  .mapping-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .mapping-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .mapping-label { width: 200px; font-size: 13px; flex-shrink: 0; }
+  .mapping-row select { flex: 1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background: var(--card); color: var(--text); }
+  .modal-footer { padding: 14px 26px; display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* How-to section */
+  .how-to { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin: 16px; padding: 20px 24px; }
+  .how-to h3 { color: var(--header-bg); margin-bottom: 10px; }
+  .how-to p, .how-to li { font-size: 13px; color: var(--text); line-height: 1.8; }
+  .how-to ul { padding-left: 20px; }
+  .tier-legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
+  .tier-legend span { font-size: 13px; font-weight: 600; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header-title { font-size: 16px; }
+    .header-right { display: none; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .search-wrap input { width: 100%; }
+    .stats-bar { justify-content: center; }
+    .stat-card { min-width: 80px; padding: 8px 14px; }
+    .table-wrap { overflow-x: auto; }
+    tbody td { font-size: 12px; padding: 6px 8px; }
+  }
+
+  /* File input hidden */
+  #csvInput { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <span class="header-title">💅 SLAY RANKER</span>
+    <span class="header-sub">✨ by Trilogy Care</span>
+  </div>
+  <div class="header-right">she scores. she slays. she converts. 💖</div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <input type="file" id="csvInput" accept=".csv">
+  <button class="btn btn-primary" onclick="document.getElementById('csvInput').click()">👛 IMPORT CSV</button>
+  <button class="btn btn-secondary" id="btnExport" disabled onclick="exportCSV()">✨ EXPORT RANKED</button>
+  <div class="toolbar-sep"></div>
+  <span class="toolbar-status" id="statusText">No leads loaded yet bestie — hit Import CSV 💅</span>
+  <div class="search-wrap">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search leads..." oninput="refreshTable()">
+  </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-card"><div class="stat-count" id="statTotal" style="color:var(--header-bg)">—</div><div class="stat-label">💅 Total Leads</div></div>
+  <div class="stat-card"><div class="stat-count" id="statLegendary" style="color:var(--legendary)">—</div><div class="stat-label">💅 Slay</div></div>
+  <div class="stat-card"><div class="stat-count" id="statEpic" style="color:var(--epic)">—</div><div class="stat-label">💖 Glam</div></div>
+  <div class="stat-card"><div class="stat-count" id="statRare" style="color:var(--rare)">—</div><div class="stat-label">🌸 Cute</div></div>
+  <div class="stat-card"><div class="stat-count" id="statCommon" style="color:var(--common)">—</div><div class="stat-label">🎀 Basic</div></div>
+</div>
+
+<!-- Table -->
+<div class="table-wrap" id="tableWrap">
+  <div class="empty-state" id="emptyState">
+    💅 Import a CSV to start slayyy-ing<br>✨ Your leads are waiting bestie
+  </div>
+  <table id="leadsTable" style="display:none">
+    <thead>
+      <tr>
+        <th data-col="rank" onclick="sortBy('rank')">Rank</th>
+        <th data-col="name" onclick="sortBy('name')">Lead Name</th>
+        <th data-col="xp" onclick="sortBy('xp')">✨ Score</th>
+        <th data-col="tier" onclick="sortBy('tier')">Vibe</th>
+        <th data-col="journey" onclick="sortBy('journey')">Journey Stage</th>
+        <th data-col="status" onclick="sortBy('status')">Lead Status</th>
+        <th data-col="source" onclick="sortBy('source')">Source</th>
+        <th data-col="notes" onclick="sortBy('notes')">Notes</th>
+        <th data-col="last_active" onclick="sortBy('last_active')">Last Active</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<!-- Detail Panel -->
+<div class="detail-panel">
+  <div class="detail-header">
+    <span>✨ Lead Score Breakdown — Spill the Tea</span>
+    <button class="btn btn-secondary" id="btnZoho" style="padding:4px 12px;font-size:11px;" disabled onclick="openZoho()">🔗 Open in Zoho CRM</button>
+  </div>
+  <div class="detail-body" id="detailBody">Select a lead to spill the tea on their score ✨</div>
+</div>
+
+<!-- How To Use -->
+<div class="how-to" id="howTo">
+  <h3>✨ How to Use Slay Ranker</h3>
+  <ul>
+    <li><strong>Import CSV</strong> — Click "Import CSV" and select your leads file.</li>
+    <li><strong>Map Columns</strong> — Match your CSV columns to scoring fields. Set to "(skip)" if unavailable.</li>
+    <li><strong>Score & Rank</strong> — Leads are scored 0–100 XP across 5 dimensions and ranked automatically.</li>
+    <li><strong>Explore</strong> — Click any lead to see their full score breakdown. Search to filter.</li>
+    <li><strong>Export</strong> — Click "Export Ranked" to download a CSV with Rank, Score, Tier, and AI Summary.</li>
+  </ul>
+  <h3 style="margin-top:14px">💅 Tier System</h3>
+  <div class="tier-legend">
+    <span class="tier-LEGENDARY">💅 Slay (75–100 XP)</span>
+    <span class="tier-EPIC">💖 Glam (50–74 XP)</span>
+    <span class="tier-RARE">🌸 Cute (25–49 XP)</span>
+    <span class="tier-COMMON">🎀 Basic (0–24 XP)</span>
+  </div>
+  <h3 style="margin-top:14px">📊 Scoring Dimensions</h3>
+  <ul>
+    <li><strong>Care Readiness</strong> (max 35 XP) — Journey Stage + self-reported status</li>
+    <li><strong>Lead Quality</strong> (max 20 XP) — Lead Status value</li>
+    <li><strong>Source Quality</strong> (max 20 XP) — Lead Source + Channel Attribution</li>
+    <li><strong>Engagement</strong> (max 15 XP) — Total Notes (touches)</li>
+    <li><strong>Recency</strong> (max 10 XP) — Last Activity Time</li>
+  </ul>
+</div>
+
+<!-- Column Mapping Modal -->
+<div class="modal-overlay" id="mappingModal">
+  <div class="modal">
+    <div class="modal-header">💅 Map Your CSV Columns</div>
+    <div class="modal-body">
+      <p>Match each scoring field to a column in your CSV. Set to "(skip)" if a field doesn't exist.</p>
+      <div id="mappingFields"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="background:var(--bg);color:var(--text-muted);" onclick="closeMapping()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmMapping()">💅 LET'S SLAY →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let rawRows = [];
+let csvColumns = [];
+let mapping = {};
+let scoredData = [];
+let sortCol = 'xp';
+let sortRev = true;
+let selectedIdx = -1;
+let currentZohoUrl = '';
+
+const TIER_META = {
+  LEGENDARY: { emoji: '💅', label: 'Slay',  color: 'legendary' },
+  EPIC:      { emoji: '💖', label: 'Glam',  color: 'epic' },
+  RARE:      { emoji: '🌸', label: 'Cute',  color: 'rare' },
+  COMMON:    { emoji: '🎀', label: 'Basic', color: 'common' },
+};
+
+const MAPPING_FIELDS = [
+  { key: 'lead_name',           label: 'Lead Name',                 hints: ['lead name','name','full name','first name','contact'] },
+  { key: 'journey_stage',       label: 'Journey Stage (HCP Status)',hints: ['journey stage','journey','hcp level','hcp','package level'] },
+  { key: 'stage',               label: 'Stage (Self-Reported)',     hints: ['stage','home care status','funding status','hcp stage'] },
+  { key: 'lead_status',         label: 'Lead Status',               hints: ['lead status','status'] },
+  { key: 'lead_source',         label: 'Lead Source',               hints: ['lead source','source','channel','origin'] },
+  { key: 'channel_attribution', label: 'Channel Attribution',       hints: ['channel attribution','attribution','attribution (text)','channel'] },
+  { key: 'total_notes',         label: 'Total Notes (Touches)',     hints: ['total notes','number of notes','notes','note count'] },
+  { key: 'last_activity',       label: 'Last Activity Time',        hints: ['last activity time','last activity','modified time','last contact'] },
+  { key: 'created_time',        label: 'Created Time',              hints: ['created time','created_time','lead created time','created date'] },
+  { key: 'description',         label: 'Description / Notes',       hints: ['description','desc','notes','comments','journey summary'] },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  CSV PARSING
+// ═══════════════════════════════════════════════════════════
+function parseCSV(text) {
+  const lines = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (inQuotes && text[i+1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if ((ch === ',' || ch === '\n' || ch === '\r') && !inQuotes) {
+      if (ch === ',') { lines.length ? lines[lines.length-1].push(current) : lines.push([current]); current = ''; }
+      else if (ch === '\n') {
+        if (lines.length) lines[lines.length-1].push(current);
+        else lines.push([current]);
+        current = '';
+        lines.push([]);
+      }
+      // skip \r
+    } else {
+      current += ch;
+    }
+  }
+  if (current || (lines.length && lines[lines.length-1].length > 0)) {
+    if (lines.length) lines[lines.length-1].push(current);
+    else lines.push([current]);
+  }
+
+  // Filter empty lines
+  const filtered = lines.filter(l => l.some(c => c.trim()));
+  if (filtered.length < 2) return { columns: [], rows: [] };
+
+  const headers = filtered[0].map(h => h.trim().replace(/^\uFEFF/, ''));
+  const rows = [];
+  for (let i = 1; i < filtered.length; i++) {
+    const row = {};
+    headers.forEach((h, j) => { row[h] = (filtered[i][j] || '').trim(); });
+    rows.push(row);
+  }
+  return { columns: headers, rows };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FILE IMPORT
+// ═══════════════════════════════════════════════════════════
+document.getElementById('csvInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const result = parseCSV(ev.target.result);
+    if (!result.rows.length) { alert('CSV file has no data rows.'); return; }
+    rawRows = result.rows;
+    csvColumns = result.columns;
+    showMappingModal();
+    document.getElementById('statusText').textContent = `📄 ${file.name}  (${rawRows.length} leads loaded)`;
+  };
+  reader.readAsText(file, 'utf-8');
+  this.value = '';
+});
+
+// ═══════════════════════════════════════════════════════════
+//  COLUMN MAPPING MODAL
+// ═══════════════════════════════════════════════════════════
+function bestGuess(hints, columns) {
+  const colsLower = {};
+  columns.forEach(c => colsLower[c.toLowerCase().trim()] = c);
+  for (const hint of hints) {
+    if (colsLower[hint]) return colsLower[hint];
+    for (const [cl, c] of Object.entries(colsLower)) {
+      if (cl.includes(hint) || hint.includes(cl)) return c;
+    }
+  }
+  return '(skip)';
+}
+
+function showMappingModal() {
+  const container = document.getElementById('mappingFields');
+  container.innerHTML = '';
+  const opts = ['(skip)', ...csvColumns];
+
+  MAPPING_FIELDS.forEach(f => {
+    const guess = bestGuess(f.hints, csvColumns);
+    const row = document.createElement('div');
+    row.className = 'mapping-row';
+    const dot = document.createElement('div');
+    dot.className = 'mapping-dot';
+    dot.style.background = guess !== '(skip)' ? 'var(--xp-fill)' : 'var(--text-muted)';
+    const label = document.createElement('div');
+    label.className = 'mapping-label';
+    label.textContent = f.label;
+    const sel = document.createElement('select');
+    sel.id = 'map_' + f.key;
+    opts.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o; opt.textContent = o;
+      if (o === guess) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => { dot.style.background = sel.value !== '(skip)' ? 'var(--xp-fill)' : 'var(--text-muted)'; });
+    row.append(dot, label, sel);
+    container.appendChild(row);
+  });
+
+  document.getElementById('mappingModal').classList.add('active');
+}
+
+function closeMapping() {
+  document.getElementById('mappingModal').classList.remove('active');
+}
+
+function confirmMapping() {
+  mapping = {};
+  MAPPING_FIELDS.forEach(f => {
+    mapping[f.key] = document.getElementById('map_' + f.key).value;
+  });
+  closeMapping();
+  scoreAllLeads();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SCORING ENGINE
+// ═══════════════════════════════════════════════════════════
+function getField(row, key) {
+  const col = mapping[key];
+  if (!col || col === '(skip)') return null;
+  const val = (row[col] || '').trim();
+  if (!val || ['nan','none','n/a','-','#n/a','false'].includes(val.toLowerCase())) return null;
+  return val;
+}
+
+function scoreCarReadiness(row) {
+  const journey = (getField(row, 'journey_stage') || '').toLowerCase();
+  const stage = (getField(row, 'stage') || '').toLowerCase();
+  const desc = (getField(row, 'description') || '').toLowerCase();
+  const combo = `${journey} ${stage} ${desc}`;
+
+  if (combo.includes('switch')) return [35, 'Actively switching providers — extremely high urgency'];
+  if (journey.includes('allocated')) {
+    if (stage.includes('referral code') || stage.includes('assigned')) return [33, 'HCP allocated & package/code confirmed — ready to onboard'];
+    return [28, 'HCP allocated — package pending confirmation'];
+  }
+  if (stage.includes('referral code')) return [30, 'Has referral code — ready to activate with Trilogy Care'];
+  if (stage.includes('assigned') || combo.includes('assigned')) return [27, 'Package assigned — ready to start services'];
+  if (combo.includes('completed') && (combo.includes('assessment') || combo.includes('acat'))) return [25, 'Completed aged care assessment — awaiting funding'];
+  if (journey.includes('active')) return [20, 'Active HCP — receiving care, potential switch opportunity'];
+  if (combo.includes('waitlist') || combo.includes('waiting')) return [15, 'On HCP waitlist — monitor for package activation'];
+  if (combo.includes('chsp')) return [10, 'On CHSP — potential future HCP upgrade'];
+  return [5, 'Care journey stage unclear — needs qualification'];
+}
+
+function scoreLeadQuality(row) {
+  const status = (getField(row, 'lead_status') || '').toLowerCase();
+  if (!status) return [0, null];
+  if (status.includes('high value')) return [20, 'Contacted – High Value lead status'];
+  if (status.includes('contacted')) return [12, 'Contacted and engaged'];
+  if (status.includes('new')) return [5, 'New — not yet contacted'];
+  return [5, `Status: ${status.charAt(0).toUpperCase() + status.slice(1)}`];
+}
+
+function scoreSourceQuality(row) {
+  const source = (getField(row, 'lead_source') || '').toLowerCase();
+  const channel = (getField(row, 'channel_attribution') || '').toLowerCase();
+  const combo = `${source} ${channel}`;
+
+  if (combo.includes('ptr') || channel.includes('partner referral')) return [20, 'Partner referral (PTR) — highest quality source'];
+  if (combo.includes('phone')) return [16, 'Phone enquiry — high intent, direct contact'];
+  if (combo.includes('website')) return [12, 'Website enquiry — organic interest'];
+  if (combo.includes('facebook') || combo.includes('instagram') || source.includes('fb')) return [8, 'Facebook/Instagram ad — marketing generated'];
+  if (combo.includes('google')) return [10, 'Google search — actively searching for care'];
+  if (source) return [5, `Source: ${source.charAt(0).toUpperCase() + source.slice(1)}`];
+  return [0, null];
+}
+
+function scoreEngagement(row) {
+  const raw = getField(row, 'total_notes') || '0';
+  const n = parseInt(parseFloat(raw)) || 0;
+  if (n >= 6) return [15, `${n} notes logged — highly engaged`];
+  if (n >= 4) return [12, `${n} notes logged — well engaged`];
+  if (n >= 3) return [9, `${n} notes logged — moderately engaged`];
+  if (n >= 2) return [6, `${n} notes logged — some engagement`];
+  if (n >= 1) return [3, `${n} note logged — minimal engagement`];
+  return [0, 'No notes recorded yet'];
+}
+
+function parseDate(raw) {
+  if (!raw) return null;
+  const clean = raw.trim().replace('T', ' ').replace('Z', '').trim();
+  // Try ISO format
+  let d = new Date(clean);
+  if (!isNaN(d)) return d;
+  // Try DD/MM/YYYY variants
+  const m1 = clean.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (m1) {
+    d = new Date(parseInt(m1[3]), parseInt(m1[2])-1, parseInt(m1[1]));
+    if (!isNaN(d)) return d;
+  }
+  return null;
+}
+
+function scoreRecency(row) {
+  const raw = getField(row, 'last_activity') || getField(row, 'created_time');
+  if (!raw) return [0, null];
+  const dt = parseDate(raw);
+  if (!dt) return [0, null];
+  const days = Math.floor((Date.now() - dt.getTime()) / 86400000);
+  if (days <= 3) return [10, `Active ${days}d ago — red hot 🔥`];
+  if (days <= 7) return [8, `Active ${days}d ago — very recent`];
+  if (days <= 14) return [6, `Active ${days}d ago — recent`];
+  if (days <= 30) return [4, `Active ${days}d ago`];
+  if (days <= 60) return [2, `Active ${days}d ago — follow up needed`];
+  return [1, `Last active ${days}d ago — going cold`];
+}
+
+function scoreLead(row) {
+  const dimensions = [
+    { label: 'Care Readiness', cap: 35, fn: scoreCarReadiness },
+    { label: 'Lead Quality',   cap: 20, fn: scoreLeadQuality },
+    { label: 'Source Quality',  cap: 20, fn: scoreSourceQuality },
+    { label: 'Engagement',      cap: 15, fn: scoreEngagement },
+    { label: 'Recency',         cap: 10, fn: scoreRecency },
+  ];
+
+  const sections = [];
+  let total = 0;
+  for (const dim of dimensions) {
+    const [pts, msg] = dim.fn(row);
+    total += pts;
+    sections.push({ label: dim.label, pts, cap: dim.cap, msg });
+  }
+
+  const xp = Math.min(Math.round(total), 100);
+  let tier;
+  if (xp >= 75) tier = 'LEGENDARY';
+  else if (xp >= 50) tier = 'EPIC';
+  else if (xp >= 25) tier = 'RARE';
+  else tier = 'COMMON';
+
+  const name = getField(row, 'lead_name') || 'Unknown Lead';
+  const openers = {
+    LEGENDARY: `💅 ${name} is an absolute SLAY — maximum onboarding potential, she's ready!`,
+    EPIC: `💖 ${name} is giving GLAM — strong conversion energy, follow up now!`,
+    RARE: `🌸 ${name} is CUTE potential — worth nurturing, don't sleep on her!`,
+    COMMON: `🎀 ${name} is giving BASIC energy — lower priority at this stage.`,
+  };
+  const hits = sections.filter(s => s.pts > 0 && s.msg).map(s => s.msg);
+  const factors = hits.slice(0, 3).join('; ') || 'Limited data available';
+  const summary = `${openers[tier]} Key signals: ${factors}. Total XP: ${xp}/100.`;
+
+  return { score: xp, tier, summary, sections, _row: row };
+}
+
+function scoreAllLeads() {
+  scoredData = rawRows.map(r => scoreLead(r));
+  document.getElementById('btnExport').disabled = false;
+  document.getElementById('howTo').style.display = 'none';
+  updateStats();
+  refreshTable();
+  setDetail('Select a lead to spill the tea on their score ✨');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════════
+function updateStats() {
+  const counts = { LEGENDARY: 0, EPIC: 0, RARE: 0, COMMON: 0 };
+  scoredData.forEach(d => counts[d.tier]++);
+  document.getElementById('statTotal').textContent = scoredData.length;
+  document.getElementById('statLegendary').textContent = counts.LEGENDARY;
+  document.getElementById('statEpic').textContent = counts.EPIC;
+  document.getElementById('statRare').textContent = counts.RARE;
+  document.getElementById('statCommon').textContent = counts.COMMON;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TABLE
+// ═══════════════════════════════════════════════════════════
+function refreshTable() {
+  const filter = (document.getElementById('searchInput').value || '').toLowerCase();
+  let data = [...scoredData];
+
+  if (filter) {
+    data = data.filter(d => Object.values(d._row).some(v => String(v).toLowerCase().includes(filter)));
+  }
+
+  // Sort
+  const tierOrder = { LEGENDARY: 4, EPIC: 3, RARE: 2, COMMON: 1 };
+  if (sortCol === 'xp') data.sort((a, b) => sortRev ? b.score - a.score : a.score - b.score);
+  else if (sortCol === 'tier') data.sort((a, b) => sortRev ? tierOrder[b.tier] - tierOrder[a.tier] : tierOrder[a.tier] - tierOrder[b.tier]);
+  else if (sortCol === 'name') {
+    data.sort((a, b) => {
+      const an = (getField(a._row, 'lead_name') || '').toLowerCase();
+      const bn = (getField(b._row, 'lead_name') || '').toLowerCase();
+      return sortRev ? bn.localeCompare(an) : an.localeCompare(bn);
+    });
+  } else if (sortCol === 'notes') {
+    data.sort((a, b) => {
+      const an = parseInt(getField(a._row, 'total_notes') || '0') || 0;
+      const bn = parseInt(getField(b._row, 'total_notes') || '0') || 0;
+      return sortRev ? bn - an : an - bn;
+    });
+  } else {
+    data.sort((a, b) => b.score - a.score);
+  }
+
+  const tbody = document.getElementById('tableBody');
+  const table = document.getElementById('leadsTable');
+  const empty = document.getElementById('emptyState');
+
+  if (!data.length && !scoredData.length) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = data.length ? 'none' : 'block';
+
+  tbody.innerHTML = '';
+  data.forEach((item, i) => {
+    const row = item._row;
+    const meta = TIER_META[item.tier];
+    const rowClass = i % 2 === 0 ? `row-${item.tier}` : `row-${item.tier}-alt`;
+
+    const get = (key, maxlen) => {
+      const v = getField(row, key);
+      if (!v) return '—';
+      return maxlen && v.length > maxlen ? v.substring(0, maxlen) + '…' : v;
+    };
+
+    const journey = get('journey_stage', 25);
+    const stageV = get('stage', 30);
+    let journeyDisplay = journey;
+    if (stageV !== '—') journeyDisplay = journey !== '—' ? `${journey} · ${stageV}` : stageV;
+
+    const lastAct = get('last_activity', 16);
+
+    const tr = document.createElement('tr');
+    tr.className = rowClass;
+    tr.dataset.idx = scoredData.indexOf(item);
+    tr.onclick = () => selectLead(tr, scoredData.indexOf(item));
+    tr.ondblclick = () => { if (currentZohoUrl) window.open(currentZohoUrl, '_blank'); };
+
+    tr.innerHTML = `
+      <td style="text-align:center;font-weight:600">${i + 1}</td>
+      <td>${escHtml(get('lead_name', 30) || '(no name)')}</td>
+      <td style="text-align:center"><span class="xp-badge tier-${item.tier}">${item.score} XP</span></td>
+      <td style="text-align:center" class="tier-${item.tier}">${meta.emoji} ${meta.label}</td>
+      <td>${escHtml(journeyDisplay)}</td>
+      <td>${escHtml(get('lead_status', 22))}</td>
+      <td>${escHtml(get('lead_source', 20))}</td>
+      <td style="text-align:center">${escHtml(get('total_notes', 5))}</td>
+      <td>${escHtml(lastAct)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Update sort indicators
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.remove('sorted-asc', 'sorted-desc');
+    if (th.dataset.col === sortCol) {
+      th.classList.add(sortRev ? 'sorted-desc' : 'sorted-asc');
+    }
+  });
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function sortBy(col) {
+  if (col === sortCol) sortRev = !sortRev;
+  else { sortCol = col; sortRev = true; }
+  refreshTable();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════════════════════
+function selectLead(tr, idx) {
+  document.querySelectorAll('tbody tr.selected').forEach(r => r.classList.remove('selected'));
+  tr.classList.add('selected');
+  selectedIdx = idx;
+  const item = scoredData[idx];
+  if (!item) return;
+
+  // Zoho URL
+  const recordId = (item._row['Record Id'] || '').trim();
+  if (recordId && !['nan','none',''].includes(recordId.toLowerCase())) {
+    currentZohoUrl = `https://crm.zoho.com/crm/org724596924/tab/Leads/${recordId.replace('zcrm_', '')}`;
+    document.getElementById('btnZoho').disabled = false;
+  } else {
+    currentZohoUrl = '';
+    document.getElementById('btnZoho').disabled = true;
+  }
+
+  const meta = TIER_META[item.tier];
+  let html = `<span class="tier-${item.tier}" style="font-weight:700">${meta.emoji} ${escHtml(item.summary)}</span>\n\n`;
+  html += `<span style="color:var(--text-muted)">  XP Breakdown:</span>\n`;
+
+  for (const s of item.sections) {
+    if (!s.msg) continue;
+    const filled = s.cap ? Math.round(s.pts / s.cap * 12) : 0;
+    const empty = 12 - filled;
+    const bar = `<span class="bar-filled">${'▓'.repeat(filled)}</span><span class="bar-empty">${'░'.repeat(empty)}</span>`;
+    const color = s.pts > 0 ? `var(--${meta.color})` : 'var(--text-muted)';
+    html += `  <span class="section-label" style="color:${color}">${escHtml(s.label)}</span>  <span class="section-pts">${String(s.pts).padStart(2)} / ${String(s.cap).padStart(2)} XP</span>  ${bar}   <span style="color:${color}">${escHtml(s.msg)}</span>\n`;
+  }
+
+  document.getElementById('detailBody').innerHTML = html;
+}
+
+function setDetail(text) {
+  document.getElementById('detailBody').innerHTML = `<span style="color:var(--text-muted)">${escHtml(text)}</span>`;
+}
+
+function openZoho() {
+  if (currentZohoUrl) window.open(currentZohoUrl, '_blank');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════════
+function exportCSV() {
+  if (!scoredData.length) return;
+  const ranked = [...scoredData].sort((a, b) => b.score - a.score);
+  const origCols = Object.keys(ranked[0]._row);
+  const extras = ['Rank', 'XP_Score', 'Tier', 'AI_Summary', 'Zoho_CRM_Link'];
+  const allCols = [...extras, ...origCols.filter(c => !extras.includes(c))];
+
+  const rows = [allCols.map(c => csvEscape(c)).join(',')];
+  ranked.forEach((item, i) => {
+    const recordId = (item._row['Record Id'] || '').trim();
+    const zohoLink = recordId && !['nan','none',''].includes(recordId.toLowerCase())
+      ? `https://crm.zoho.com/crm/org724596924/tab/Leads/${recordId.replace('zcrm_', '')}`
+      : '';
+    const out = { ...item._row, Rank: i + 1, XP_Score: item.score, Tier: item.tier, AI_Summary: item.summary, Zoho_CRM_Link: zohoLink };
+    rows.push(allCols.map(c => csvEscape(String(out[c] || ''))).join(','));
+  });
+
+  const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Trilogy_Care_Ranked_Leads.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function csvEscape(val) {
+  if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+    return '"' + val.replace(/"/g, '""') + '"';
+  }
+  return val;
+}
+</script>
+</body>
+</html>

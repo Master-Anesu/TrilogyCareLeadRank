@@ -1,0 +1,80 @@
+╔══════════════════════════════════════════════════════════════╗
+║            TRILOGY CARE LEAD RANK  v1.0                     ║
+║                    How to Run                               ║
+╚══════════════════════════════════════════════════════════════╝
+
+REQUIREMENTS
+────────────
+• Python 3.8 or higher  (https://www.python.org/downloads/)
+• pandas library (optional but recommended for reliable CSV reading)
+
+
+QUICK START
+────────────
+1. Install pandas (one-time setup):
+      pip install pandas
+
+2. Double-click  trilogy_care_lead_rank.py
+   OR open a terminal in this folder and run:
+      python trilogy_care_lead_rank.py
+
+
+HOW TO USE THE APP
+────────────────────
+1. Click "Import CSV" and select your leads file.
+
+2. The column mapping screen appears — match your CSV columns
+   to the scoring fields (Age, HCP Level, Referral Source, etc.).
+   Any columns you don't have can be set to "(skip)".
+
+3. Click "Score My Leads →" — the app scores and ranks all leads.
+
+4. Leads are ranked from highest to lowest score (0–100).
+   Tiers are:
+     🔥 Hot      (75–100)  — High priority, strong onboarding signal
+     ⭐ Warm     (50–74)   — Good potential
+     📋 Moderate (25–49)   — Follow up when capacity allows
+     ❄️  Cold     (0–24)    — Lower priority at this stage
+
+5. Click any lead row to see their full score breakdown
+   at the bottom of the screen.
+
+6. Click "Export Ranked CSV" to save a new CSV with Rank,
+   Score, Tier, and AI_Summary columns added.
+
+
+SCORING DIMENSIONS
+────────────────────
+The app scores each lead across five areas:
+
+  Age Profile      (max 30 pts)  — Older = higher care urgency
+  HCP Level        (max 35 pts)  — Higher package = more complex, urgent need
+  Referral Source  (max 20 pts)  — Hospital > ACAT > GP > Family > Self
+  Lead Recency     (max 10 pts)  — Fresher leads score higher
+  Location         (max  5 pts)  — Within known Trilogy Care service areas
+
+
+CSV FORMAT
+────────────
+Your CSV can have any column names — the mapping screen lets you
+match them. Common fields that work well:
+
+  Name / Client Name
+  Age  OR  Date of Birth (DOB)
+  HCP Level / Package Level (values like "Level 4", "HCP 3", "4")
+  Referral Source / Channel
+  Created Date / Submitted Date
+  Postcode / Location / Address
+
+
+TROUBLESHOOTING
+────────────────
+• "No module named tkinter"  → Install Python with the Tk/Tcl option
+  (on macOS: brew install python-tk)
+
+• CSV not reading correctly  → Make sure it's saved as UTF-8 CSV
+  (in Excel: Save As → CSV UTF-8)
+
+
+────────────────────────────────────────────────────────────────
+For support: anesut@trilogycare.com.au
