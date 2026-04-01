@@ -1,0 +1,166 @@
+{
+  "dashboard_name": "Top Dog Team Stats",
+  "extracted_date": "2026-04-01",
+  "source": "Zoho CRM - Analytics Dashboard",
+  "monthly_sales_targets": {
+    "title": "Monthly Sales",
+    "metric": "Record Count",
+    "data": [
+      {"name": "Ehtisham Muhammad Mehdi", "target": 80},
+      {"name": "Telesia Mau'u", "target": 60},
+      {"name": "Caitlin Burrill", "target": 90},
+      {"name": "Aprocina Anthony", "target": 60},
+      {"name": "Stella Su'a", "target": 60},
+      {"name": "Daneeka Miles", "target": 60},
+      {"name": "Heidi Brdoch", "target": 60},
+      {"name": "Bryan Kokiai-Jacobs", "target": 60},
+      {"name": "Dominic Stevenson", "target": 60}
+    ]
+  },
+  "quarter_sales_targets": {
+    "title": "Quarter Sales Target",
+    "metric": "Record Count",
+    "data": [
+      {"name": "Ehtisham Muhammad Mehdi", "target": 140},
+      {"name": "Caitlin Burrill", "target": 140},
+      {"name": "Telesia Mau'u", "target": 140},
+      {"name": "Aprocina Anthony", "target": 140},
+      {"name": "Stella Su'a", "target": 140},
+      {"name": "Daneeka Miles", "target": 140},
+      {"name": "Heidi Brdoch", "target": 140},
+      {"name": "Bryan Kokiai-Jacobs", "target": 140},
+      {"name": "Dominic Stevenson", "target": 140}
+    ]
+  },
+  "top_dog_sales_weekly": {
+    "title": "Top Dog Sales Weekly",
+    "metric": "Record Count",
+    "data": [
+      {"week": "W40", "count": 25},
+      {"week": "W42", "count": 46},
+      {"week": "W44", "count": 63},
+      {"week": "W46", "count": 56},
+      {"week": "W48", "count": 92},
+      {"week": "W50", "count": 61},
+      {"week": "W52", "count": 82},
+      {"week": "W02", "count": 90},
+      {"week": "W04", "count": 79},
+      {"week": "W06", "count": 99},
+      {"week": "W08", "count": 127},
+      {"week": "W10", "count": 81},
+      {"week": "W12", "count": 46},
+      {"week": "W14", "count": 43}
+    ]
+  },
+  "ogs_sales_weekly": {
+    "title": "The OGs Sales Weekly",
+    "metric": "Record Count",
+    "data": [
+      {"week": "W40", "count": 26},
+      {"week": "W42", "count": 28},
+      {"week": "W44", "count": 27},
+      {"week": "W46", "count": 76},
+      {"week": "W48", "count": 80},
+      {"week": "W50", "count": 71},
+      {"week": "W52", "count": 57},
+      {"week": "W02", "count": 78},
+      {"week": "W04", "count": 72},
+      {"week": "W06", "count": 68},
+      {"week": "W08", "count": 78},
+      {"week": "W10", "count": 65},
+      {"week": "W12", "count": 54},
+      {"week": "W14", "count": 33}
+    ]
+  },
+  "top_dogs_monthly": {
+    "title": "Top Dogs Monthly",
+    "metric": "Record Count",
+    "data": [
+      {"month": "Oct 2025", "count": 282},
+      {"month": "Nov 2025", "count": 312},
+      {"month": "Dec 2025", "count": 384},
+      {"month": "Jan 2026", "count": 401},
+      {"month": "Feb 2026", "count": 466},
+      {"month": "Mar 2026", "count": 461}
+    ]
+  },
+  "ogs_monthly": {
+    "title": "The OG's Monthly",
+    "metric": "Record Count",
+    "data": [
+      {"month": "Oct 2025", "count": 237},
+      {"month": "Nov 2025", "count": 278},
+      {"month": "Dec 2025", "count": 294},
+      {"month": "Jan 2026", "count": 335},
+      {"month": "Feb 2026", "count": 258},
+      {"month": "Mar 2026", "count": 285}
+    ]
+  },
+  "sales_leaderboard_previous_month": {
+    "title": "Sales Leaderboard — March 2026",
+    "comparison_period": "Compared with Nov 2025",
+    "data": [
+      {"name": "Aprocina Anthony", "count": 124, "change": "103.3%"},
+      {"name": "Hunter Goodfellow", "count": 77, "change": "165.5%"},
+      {"name": "Caitlin Burrill", "count": 70, "change": "13.6%"},
+      {"name": "Heidi Brdoch", "count": 66, "change": "100%"},
+      {"name": "Ehtisham Muhammad Mehdi", "count": 55, "change": "17.0%"},
+      {"name": "Stella Su'a", "count": 55, "change": "161.9%"},
+      {"name": "Telesia Mau'u", "count": 52, "change": "36.8%"},
+      {"name": "Sophie Farrow", "count": 46, "change": "17.9%"},
+      {"name": "Paula Burnage", "count": 45, "change": "26.2%"},
+      {"name": "Daneeka Miles", "count": 33, "change": "560.0%"},
+      {"name": "Kerryn Fay", "count": 12, "change": "75%"},
+      {"name": "Isaiah Taderera", "count": 8, "change": "33.3%"},
+      {"name": "Luke Saito", "count": 7, "change": "100%"},
+      {"name": "Bryan Kokiai-Jacobs", "count": 6, "change": "100%"},
+      {"name": "Anesu Taderera", "count": 5, "change": "79.2%"},
+      {"name": "Shannon Robertson", "count": 3, "change": "57.1%"},
+      {"name": "Bonheur Chala", "count": 2, "change": "100.0%"},
+      {"name": "Matthew Farrelly", "count": 1, "change": "0%"}
+    ]
+  },
+  "sales_leaderboard_weekly_prior": {
+    "title": "Sales Leaderboard Weekly",
+    "comparison_period": "Compared with Oct 27-31, 2025",
+    "data": [
+      {"name": "Aprocina Anthony", "count": 26, "change": "2500.0%"},
+      {"name": "Heidi Brdoch", "count": 21, "change": "100%"},
+      {"name": "Telesia Mau'u", "count": 19, "change": "11.8%"},
+      {"name": "Caitlin Burrill", "count": 17, "change": "10.5%"},
+      {"name": "Corey McConkie", "count": 15, "change": "100%"},
+      {"name": "Ehtisham Muhammad Mehdi", "count": 13, "change": "85.7%"},
+      {"name": "Daneeka Miles", "count": 12, "change": "100%"},
+      {"name": "Hunter Goodfellow", "count": 10, "change": "100.0%"},
+      {"name": "Bonheur Chala", "count": 10, "change": "100%"},
+      {"name": "Sophie Farrow", "count": 9, "change": "50%"},
+      {"name": "Matthew Farrelly", "count": 8, "change": "100%"},
+      {"name": "Anesu Taderera", "count": 5, "change": "78.3%"},
+      {"name": "Paula Burnage", "count": 3, "change": "62.5%"},
+      {"name": "Luke Saito", "count": 2, "change": "100%"}
+    ]
+  },
+  "daily_targets": {
+    "top_dogs_daily": {"current": 0, "target": 25, "remaining": 25},
+    "closers_club_daily": {"current": 0, "target": 25, "remaining": 25}
+  },
+  "returning_client_cm": {
+    "title": "Returning Client CM",
+    "data": [
+      {"name": "Damien Tink", "count": 1},
+      {"name": "Paula Burnage", "count": 1},
+      {"name": "Trilogy Care", "count": 1}
+    ],
+    "total": 3
+  },
+  "top_dogs_quarter": {
+    "title": "Top Dogs Quarter",
+    "metric": "Record Count",
+    "data": [
+      {"quarter": "FY25-Q4", "count": 138},
+      {"quarter": "FY26-Q1", "count": 414},
+      {"quarter": "FY26-Q2", "count": 981},
+      {"quarter": "FY26-Q3", "count": 1328}
+    ]
+  }
+}

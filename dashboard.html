@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trilogy Care — Top Dog Arena</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a1a;--bg2:#111128;--card:#16163a;--card-border:#2a2a6a;
+  --neon-blue:#00e5ff;--neon-pink:#ff2d95;--neon-green:#39ff14;--neon-yellow:#ffe600;--neon-purple:#b44dff;--neon-orange:#ff6a00;
+  --text:#e0e0ff;--text-dim:#7070aa;--text-bright:#ffffff;
+  --gold:#ffd700;--silver:#c0c0c0;--bronze:#cd7f32;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* Scanline overlay */
+body::after{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+  pointer-events:none;z-index:9999;
+}
+
+/* ── Animated BG particles ── */
+.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.08;
+  background-image:linear-gradient(var(--neon-blue) 1px,transparent 1px),linear-gradient(90deg,var(--neon-blue) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* ── Header ── */
+.header{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,#0d0d2b 0%,#1a0a2e 50%,#0d0d2b 100%);
+  border-bottom:2px solid var(--neon-pink);
+  padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 0 30px rgba(255,45,149,0.3);
+}
+.header-left{display:flex;align-items:center;gap:16px}
+.logo-icon{font-size:36px;filter:drop-shadow(0 0 10px var(--neon-pink))}
+.header-title{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--neon-pink);text-shadow:0 0 20px rgba(255,45,149,0.8);letter-spacing:2px}
+.header-sub{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--neon-blue);margin-top:4px;letter-spacing:4px}
+.header-right{text-align:right}
+.header-date{font-family:'Orbitron',sans-serif;font-size:12px;color:var(--neon-yellow);text-shadow:0 0 10px rgba(255,230,0,0.5)}
+.header-source{font-size:10px;color:var(--text-dim);margin-top:2px}
+.pulse-dot{display:inline-block;width:8px;height:8px;background:var(--neon-green);border-radius:50%;margin-right:6px;animation:pulse 1.5s infinite;box-shadow:0 0 8px var(--neon-green)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+/* ── Nav tabs ── */
+.nav-bar{
+  position:relative;z-index:10;
+  background:var(--bg2);border-bottom:1px solid var(--card-border);
+  display:flex;align-items:center;padding:0 24px;gap:0;overflow-x:auto;
+}
+.nav-tab{
+  padding:12px 20px;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+  color:var(--text-dim);cursor:pointer;border-bottom:3px solid transparent;
+  transition:all 0.3s;white-space:nowrap;letter-spacing:1px;
+}
+.nav-tab:hover{color:var(--neon-blue);background:rgba(0,229,255,0.05)}
+.nav-tab.active{color:var(--neon-blue);border-bottom-color:var(--neon-blue);text-shadow:0 0 10px rgba(0,229,255,0.5)}
+
+/* ── Main layout ── */
+.main{position:relative;z-index:10;padding:24px;max-width:1600px;margin:0 auto}
+.section{display:none}
+.section.active{display:block}
+.section-title{
+  font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;
+  color:var(--neon-pink);text-shadow:0 0 15px rgba(255,45,149,0.4);
+  margin-bottom:20px;padding-bottom:10px;
+  border-bottom:1px solid rgba(255,45,149,0.2);letter-spacing:2px;
+}
+
+/* ── Stat cards row ── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{
+  background:linear-gradient(135deg,var(--card) 0%,rgba(42,42,106,0.3) 100%);
+  border:1px solid var(--card-border);border-radius:8px;padding:16px 20px;
+  position:relative;overflow:hidden;transition:all 0.3s;
+}
+.stat-card:hover{border-color:var(--neon-blue);box-shadow:0 0 20px rgba(0,229,255,0.15);transform:translateY(-2px)}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+}
+.stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;font-family:'Orbitron',sans-serif}
+.stat-value{font-size:32px;font-weight:900;font-family:'Orbitron',sans-serif;margin-top:4px;
+  background:linear-gradient(135deg,var(--neon-blue),var(--neon-pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-change{font-size:12px;margin-top:4px;font-weight:600}
+.stat-change.up{color:var(--neon-green)}
+.stat-change.down{color:var(--neon-pink)}
+
+/* ── Cards ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:24px}
+@media(max-width:1000px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+  padding:20px;position:relative;overflow:hidden;
+}
+.card-title{
+  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;
+  color:var(--neon-yellow);letter-spacing:2px;margin-bottom:16px;
+  text-shadow:0 0 8px rgba(255,230,0,0.3);
+}
+.card-glow-blue{border-color:rgba(0,229,255,0.3);box-shadow:0 0 20px rgba(0,229,255,0.08)}
+.card-glow-pink{border-color:rgba(255,45,149,0.3);box-shadow:0 0 20px rgba(255,45,149,0.08)}
+.card-glow-green{border-color:rgba(57,255,20,0.3);box-shadow:0 0 20px rgba(57,255,20,0.08)}
+
+/* ── Leaderboard table ── */
+.lb-table{width:100%;border-collapse:separate;border-spacing:0 4px}
+.lb-table th{
+  font-family:'Orbitron',sans-serif;font-size:10px;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:2px;text-align:left;padding:8px 12px;
+}
+.lb-table td{padding:10px 12px;font-size:14px;font-weight:600}
+.lb-row{background:rgba(255,255,255,0.02);border-radius:6px;transition:all 0.2s}
+.lb-row:hover{background:rgba(0,229,255,0.06)}
+.lb-row td:first-child{border-radius:6px 0 0 6px}
+.lb-row td:last-child{border-radius:0 6px 6px 0}
+.rank-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:50%;font-family:'Press Start 2P',monospace;font-size:9px;
+  font-weight:700;
+}
+.rank-1{background:linear-gradient(135deg,#ffd700,#ffaa00);color:#1a0a00;box-shadow:0 0 12px rgba(255,215,0,0.5)}
+.rank-2{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);color:#1a1a1a;box-shadow:0 0 12px rgba(192,192,192,0.4)}
+.rank-3{background:linear-gradient(135deg,#cd7f32,#b06820);color:#fff;box-shadow:0 0 12px rgba(205,127,50,0.4)}
+.rank-other{background:rgba(255,255,255,0.06);color:var(--text-dim)}
+.player-name{color:var(--text-bright)}
+.score-val{color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-weight:700}
+.change-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;
+}
+.change-up{background:rgba(57,255,20,0.12);color:var(--neon-green)}
+.change-down{background:rgba(255,45,149,0.12);color:var(--neon-pink)}
+
+/* ── XP / Progress bars ── */
+.xp-bar-wrap{margin-bottom:12px}
+.xp-label{display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px}
+.xp-name{color:var(--text);font-weight:600}
+.xp-val{color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:12px}
+.xp-bar{height:20px;background:rgba(255,255,255,0.05);border-radius:10px;overflow:hidden;position:relative}
+.xp-fill{height:100%;border-radius:10px;transition:width 1s ease;position:relative}
+.xp-fill::after{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.2) 50%,transparent 100%);
+  animation:xp-shine 2s infinite;
+}
+@keyframes xp-shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+/* ── Daily target HUD ── */
+.hud-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+@media(max-width:800px){.hud-row{grid-template-columns:1fr}}
+.hud-card{
+  background:linear-gradient(135deg,var(--card),rgba(42,42,106,0.5));
+  border:2px solid var(--card-border);border-radius:12px;padding:24px;text-align:center;
+  position:relative;
+}
+.hud-title{font-family:'Orbitron',sans-serif;font-size:12px;color:var(--neon-yellow);letter-spacing:3px;margin-bottom:12px}
+.hud-circle{
+  width:120px;height:120px;margin:0 auto 12px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.hud-circle svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.hud-circle .hud-num{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--neon-blue);text-shadow:0 0 15px rgba(0,229,255,0.6)}
+.hud-remaining{font-size:12px;color:var(--text-dim);font-family:'Orbitron',sans-serif}
+
+/* ── Chart containers ── */
+.chart-wrap{position:relative;height:300px}
+.chart-wrap canvas{width:100%!important;height:100%!important}
+
+/* ── Footer ── */
+.footer{
+  position:relative;z-index:10;text-align:center;padding:20px;
+  border-top:1px solid var(--card-border);margin-top:40px;
+}
+.footer-text{font-size:11px;color:var(--text-dim);font-family:'Orbitron',sans-serif;letter-spacing:2px}
+
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.5s ease forwards}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--neon-blue)}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-icon">&#127918;</div>
+    <div>
+      <div class="header-title">TOP DOG ARENA</div>
+      <div class="header-sub">TRILOGY CARE SALES HQ</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-date"><span class="pulse-dot"></span>LIVE DATA &mdash; APR 1, 2026</div>
+    <div class="header-source">Source: Zoho CRM Analytics</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-bar" id="nav">
+  <div class="nav-tab active" data-tab="overview">COMMAND CENTER</div>
+  <div class="nav-tab" data-tab="leaderboards">LEADERBOARDS</div>
+  <div class="nav-tab" data-tab="weekly">WEEKLY RAIDS</div>
+  <div class="nav-tab" data-tab="monthly">MONTHLY QUESTS</div>
+  <div class="nav-tab" data-tab="targets">MISSION TARGETS</div>
+  <div class="nav-tab" data-tab="quarters">SEASON STATS</div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ===== COMMAND CENTER ===== -->
+  <section id="overview" class="section active">
+    <div class="section-title">&#9889; COMMAND CENTER</div>
+
+    <div class="stats-row" id="topStats"></div>
+
+    <div class="hud-row">
+      <div class="hud-card card-glow-blue">
+        <div class="hud-title">TOP DOGS DAILY</div>
+        <div class="hud-circle">
+          <svg width="120" height="120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/><circle id="hudCircle1" cx="60" cy="60" r="52" fill="none" stroke="var(--neon-blue)" stroke-width="8" stroke-dasharray="326.73" stroke-dashoffset="326.73" stroke-linecap="round"/></svg>
+          <div class="hud-num" id="hudNum1">0/25</div>
+        </div>
+        <div class="hud-remaining">25 REMAINING</div>
+      </div>
+      <div class="hud-card card-glow-pink">
+        <div class="hud-title">CLOSERS CLUB DAILY</div>
+        <div class="hud-circle">
+          <svg width="120" height="120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/><circle id="hudCircle2" cx="60" cy="60" r="52" fill="none" stroke="var(--neon-pink)" stroke-width="8" stroke-dasharray="326.73" stroke-dashoffset="326.73" stroke-linecap="round"/></svg>
+          <div class="hud-num" id="hudNum2">0/25</div>
+        </div>
+        <div class="hud-remaining">25 REMAINING</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-glow-blue">
+        <div class="card-title">&#128200; TOP DOGS — MONTHLY TREND</div>
+        <div class="chart-wrap"><canvas id="chartOverviewMonthly"></canvas></div>
+      </div>
+      <div class="card card-glow-pink">
+        <div class="card-title">&#127942; TOP 5 — MARCH 2026</div>
+        <table class="lb-table" id="topFiveTable"></table>
+      </div>
+    </div>
+
+    <div class="card card-glow-green" style="margin-bottom:24px">
+      <div class="card-title">&#128257; RETURNING CLIENTS</div>
+      <table class="lb-table">
+        <thead><tr><th>CLIENT</th><th>COUNT</th></tr></thead>
+        <tbody id="returningTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== LEADERBOARDS ===== -->
+  <section id="leaderboards" class="section">
+    <div class="section-title">&#127942; LEADERBOARDS</div>
+    <div class="grid-2">
+      <div class="card card-glow-blue">
+        <div class="card-title">&#128081; MONTHLY MVP — MARCH 2026</div>
+        <table class="lb-table" id="lbMonthlyTable"></table>
+      </div>
+      <div class="card card-glow-pink">
+        <div class="card-title">&#9876; WEEKLY WARRIORS</div>
+        <table class="lb-table" id="lbWeeklyTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WEEKLY RAIDS ===== -->
+  <section id="weekly" class="section">
+    <div class="section-title">&#9876; WEEKLY RAIDS</div>
+    <div class="grid-2">
+      <div class="card card-glow-blue">
+        <div class="card-title">TOP DOGS WEEKLY</div>
+        <div class="chart-wrap"><canvas id="chartWeeklyTD"></canvas></div>
+      </div>
+      <div class="card card-glow-pink">
+        <div class="card-title">THE OGs WEEKLY</div>
+        <div class="chart-wrap"><canvas id="chartWeeklyOG"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MONTHLY QUESTS ===== -->
+  <section id="monthly" class="section">
+    <div class="section-title">&#128640; MONTHLY QUESTS</div>
+    <div class="grid-2">
+      <div class="card card-glow-blue">
+        <div class="card-title">TOP DOGS MONTHLY</div>
+        <div class="chart-wrap"><canvas id="chartMonthlyTD"></canvas></div>
+      </div>
+      <div class="card card-glow-pink">
+        <div class="card-title">THE OGs MONTHLY</div>
+        <div class="chart-wrap"><canvas id="chartMonthlyOG"></canvas></div>
+      </div>
+    </div>
+    <div class="card card-glow-green">
+      <div class="card-title">&#128200; HEAD-TO-HEAD COMPARISON</div>
+      <div class="chart-wrap"><canvas id="chartMonthlyCompare"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ===== MISSION TARGETS ===== -->
+  <section id="targets" class="section">
+    <div class="section-title">&#127919; MISSION TARGETS</div>
+    <div class="grid-2">
+      <div class="card card-glow-blue">
+        <div class="card-title">MONTHLY TARGETS</div>
+        <div id="monthlyTargetBars"></div>
+      </div>
+      <div class="card card-glow-pink">
+        <div class="card-title">QUARTER TARGETS</div>
+        <div id="quarterTargetBars"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SEASON STATS ===== -->
+  <section id="quarters" class="section">
+    <div class="section-title">&#127775; SEASON STATS</div>
+    <div class="card card-glow-blue" style="margin-bottom:24px">
+      <div class="card-title">TOP DOGS — QUARTERLY PROGRESSION</div>
+      <div class="chart-wrap"><canvas id="chartQuarter"></canvas></div>
+    </div>
+    <div class="stats-row" id="quarterCards"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-text">TRILOGY CARE &bull; TOP DOG ARENA &bull; 2026 &bull; POWERED BY ANALYTICS EXPORT</div>
+</footer>
+
+<script>
+// ── DATA ──
+const D = {
+  monthly_sales_targets:[{n:"Ehtisham Muhammad Mehdi",t:80},{n:"Telesia Mau'u",t:60},{n:"Caitlin Burrill",t:90},{n:"Aprocina Anthony",t:60},{n:"Stella Su'a",t:60},{n:"Daneeka Miles",t:60},{n:"Heidi Brdoch",t:60},{n:"Bryan Kokiai-Jacobs",t:60},{n:"Dominic Stevenson",t:60}],
+  quarter_sales_targets:[{n:"Ehtisham Muhammad Mehdi",t:140},{n:"Caitlin Burrill",t:140},{n:"Telesia Mau'u",t:140},{n:"Aprocina Anthony",t:140},{n:"Stella Su'a",t:140},{n:"Daneeka Miles",t:140},{n:"Heidi Brdoch",t:140},{n:"Bryan Kokiai-Jacobs",t:140},{n:"Dominic Stevenson",t:140}],
+  td_weekly:[{w:"W40",c:25},{w:"W42",c:46},{w:"W44",c:63},{w:"W46",c:56},{w:"W48",c:92},{w:"W50",c:61},{w:"W52",c:82},{w:"W02",c:90},{w:"W04",c:79},{w:"W06",c:99},{w:"W08",c:127},{w:"W10",c:81},{w:"W12",c:46},{w:"W14",c:43}],
+  og_weekly:[{w:"W40",c:26},{w:"W42",c:28},{w:"W44",c:27},{w:"W46",c:76},{w:"W48",c:80},{w:"W50",c:71},{w:"W52",c:57},{w:"W02",c:78},{w:"W04",c:72},{w:"W06",c:68},{w:"W08",c:78},{w:"W10",c:65},{w:"W12",c:54},{w:"W14",c:33}],
+  td_monthly:[{m:"Oct 25",c:282},{m:"Nov 25",c:312},{m:"Dec 25",c:384},{m:"Jan 26",c:401},{m:"Feb 26",c:466},{m:"Mar 26",c:461}],
+  og_monthly:[{m:"Oct 25",c:237},{m:"Nov 25",c:278},{m:"Dec 25",c:294},{m:"Jan 26",c:335},{m:"Feb 26",c:258},{m:"Mar 26",c:285}],
+  lb_month:[
+    {n:"Aprocina Anthony",c:124,ch:"103.3%"},{n:"Hunter Goodfellow",c:77,ch:"165.5%"},{n:"Caitlin Burrill",c:70,ch:"13.6%"},
+    {n:"Heidi Brdoch",c:66,ch:"100%"},{n:"Ehtisham M. Mehdi",c:55,ch:"17.0%"},{n:"Stella Su'a",c:55,ch:"161.9%"},
+    {n:"Telesia Mau'u",c:52,ch:"36.8%"},{n:"Sophie Farrow",c:46,ch:"17.9%"},{n:"Paula Burnage",c:45,ch:"26.2%"},
+    {n:"Daneeka Miles",c:33,ch:"560.0%"},{n:"Kerryn Fay",c:12,ch:"75%"},{n:"Isaiah Taderera",c:8,ch:"33.3%"},
+    {n:"Luke Saito",c:7,ch:"100%"},{n:"Bryan Kokiai-Jacobs",c:6,ch:"100%"},{n:"Anesu Taderera",c:5,ch:"79.2%"},
+    {n:"Shannon Robertson",c:3,ch:"57.1%"},{n:"Bonheur Chala",c:2,ch:"100.0%"},{n:"Matthew Farrelly",c:1,ch:"0%"}
+  ],
+  lb_week:[
+    {n:"Aprocina Anthony",c:26,ch:"2500.0%"},{n:"Heidi Brdoch",c:21,ch:"100%"},{n:"Telesia Mau'u",c:19,ch:"11.8%"},
+    {n:"Caitlin Burrill",c:17,ch:"10.5%"},{n:"Corey McConkie",c:15,ch:"100%"},{n:"Ehtisham M. Mehdi",c:13,ch:"85.7%"},
+    {n:"Daneeka Miles",c:12,ch:"100%"},{n:"Hunter Goodfellow",c:10,ch:"100.0%"},{n:"Bonheur Chala",c:10,ch:"100%"},
+    {n:"Sophie Farrow",c:9,ch:"50%"},{n:"Matthew Farrelly",c:8,ch:"100%"},{n:"Anesu Taderera",c:5,ch:"78.3%"},
+    {n:"Paula Burnage",c:3,ch:"62.5%"},{n:"Luke Saito",c:2,ch:"100%"}
+  ],
+  quarters:[{q:"FY25-Q4",c:138},{q:"FY26-Q1",c:414},{q:"FY26-Q2",c:981},{q:"FY26-Q3",c:1328}],
+  returning:[{n:"Damien Tink",c:1},{n:"Paula Burnage",c:1},{n:"Trilogy Care",c:1}]
+};
+
+// ── CHART DEFAULTS ──
+Chart.defaults.color='#7070aa';
+Chart.defaults.borderColor='rgba(255,255,255,0.04)';
+Chart.defaults.font.family="'Rajdhani',sans-serif";
+const NEON=['#00e5ff','#ff2d95','#39ff14','#ffe600','#b44dff','#ff6a00','#00ff88','#ff4444'];
+
+function neonGradient(ctx,c1,c2){const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,c1);g.addColorStop(1,c2+'33');return g;}
+
+// ── TAB NAVIGATION ──
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    const sec=document.getElementById(tab.dataset.tab);
+    sec.classList.add('active');
+    sec.querySelectorAll('.fade-in').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=null;});
+  });
+});
+
+// ── TOP STATS ──
+(function(){
+  const totalMarch=D.lb_month.reduce((s,x)=>s+x.c,0);
+  const tdTotal=D.td_monthly.reduce((s,x)=>s+x.c,0);
+  const ogTotal=D.og_monthly.reduce((s,x)=>s+x.c,0);
+  const avgWeekly=Math.round(D.td_weekly.reduce((s,x)=>s+x.c,0)/D.td_weekly.length);
+  const items=[
+    {label:'MARCH SALES',value:totalMarch,change:'+12.3%',up:true},
+    {label:'TOP DOGS TOTAL',value:tdTotal,change:'6-mo',up:true},
+    {label:'OGs TOTAL',value:ogTotal,change:'6-mo',up:true},
+    {label:'AVG WEEKLY',value:avgWeekly,change:'Top Dogs',up:true},
+    {label:'ACTIVE PLAYERS',value:D.lb_month.length,change:'This month',up:true},
+  ];
+  document.getElementById('topStats').innerHTML=items.map(i=>`
+    <div class="stat-card fade-in">
+      <div class="stat-label">${i.label}</div>
+      <div class="stat-value">${i.value.toLocaleString()}</div>
+      <div class="stat-change ${i.up?'up':'down'}">${i.change}</div>
+    </div>`).join('');
+})();
+
+// ── OVERVIEW MONTHLY CHART ──
+(function(){
+  const ctx=document.getElementById('chartOverviewMonthly').getContext('2d');
+  new Chart(ctx,{type:'line',data:{
+    labels:D.td_monthly.map(x=>x.m),
+    datasets:[
+      {label:'Top Dogs',data:D.td_monthly.map(x=>x.c),borderColor:'#00e5ff',backgroundColor:neonGradient(ctx,'#00e5ff44','#00e5ff'),fill:true,tension:0.4,pointBackgroundColor:'#00e5ff',pointBorderWidth:0,pointRadius:5},
+      {label:'The OGs',data:D.og_monthly.map(x=>x.c),borderColor:'#ff2d95',backgroundColor:neonGradient(ctx,'#ff2d9544','#ff2d95'),fill:true,tension:0.4,pointBackgroundColor:'#ff2d95',pointBorderWidth:0,pointRadius:5}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e0e0ff',usePointStyle:true,pointStyle:'circle'}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'}},x:{grid:{display:false}}}}});
+})();
+
+// ── TOP 5 TABLE ──
+(function(){
+  let html='<thead><tr><th>RANK</th><th>PLAYER</th><th>SCORE</th><th>POWER</th></tr></thead><tbody>';
+  D.lb_month.slice(0,5).forEach((p,i)=>{
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+    html+=`<tr class="lb-row"><td><span class="rank-badge ${rc}">${i+1}</span></td><td class="player-name">${p.n}</td><td class="score-val">${p.c}</td><td><span class="change-badge change-up">+${p.ch}</span></td></tr>`;
+  });
+  html+='</tbody>';
+  document.getElementById('topFiveTable').innerHTML=html;
+})();
+
+// ── RETURNING CLIENTS ──
+(function(){
+  document.getElementById('returningTable').innerHTML=D.returning.map(r=>`<tr class="lb-row"><td class="player-name">${r.n}</td><td class="score-val">${r.c}</td></tr>`).join('');
+})();
+
+// ── LEADERBOARDS ──
+function buildLB(data,targetId){
+  let html='<thead><tr><th>RANK</th><th>PLAYER</th><th>KILLS</th><th>POWER-UP</th></tr></thead><tbody>';
+  data.forEach((p,i)=>{
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+    const chVal=parseFloat(p.ch);
+    const cls=chVal>=50?'change-up':'change-up';
+    html+=`<tr class="lb-row"><td><span class="rank-badge ${rc}">${i+1}</span></td><td class="player-name">${p.n}</td><td class="score-val">${p.c}</td><td><span class="change-badge ${cls}">+${p.ch}</span></td></tr>`;
+  });
+  html+='</tbody>';
+  document.getElementById(targetId).innerHTML=html;
+}
+buildLB(D.lb_month,'lbMonthlyTable');
+buildLB(D.lb_week,'lbWeeklyTable');
+
+// ── WEEKLY CHARTS ──
+function weeklyChart(canvasId,data,color){
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  new Chart(ctx,{type:'bar',data:{
+    labels:data.map(x=>x.w),
+    datasets:[{label:'Sales',data:data.map(x=>x.c),backgroundColor:color+'88',borderColor:color,borderWidth:2,borderRadius:4,hoverBackgroundColor:color}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'}},x:{grid:{display:false}}}}});
+}
+weeklyChart('chartWeeklyTD',D.td_weekly,'#00e5ff');
+weeklyChart('chartWeeklyOG',D.og_weekly,'#ff2d95');
+
+// ── MONTHLY CHARTS ──
+function monthlyChart(canvasId,data,color){
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  new Chart(ctx,{type:'bar',data:{
+    labels:data.map(x=>x.m),
+    datasets:[{label:'Sales',data:data.map(x=>x.c),backgroundColor:neonGradient(ctx,color+'cc',color),borderColor:color,borderWidth:2,borderRadius:6,hoverBackgroundColor:color}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'}},x:{grid:{display:false}}}}});
+}
+monthlyChart('chartMonthlyTD',D.td_monthly,'#00e5ff');
+monthlyChart('chartMonthlyOG',D.og_monthly,'#ff2d95');
+
+// ── COMPARISON CHART ──
+(function(){
+  const ctx=document.getElementById('chartMonthlyCompare').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{
+    labels:D.td_monthly.map(x=>x.m),
+    datasets:[
+      {label:'Top Dogs',data:D.td_monthly.map(x=>x.c),backgroundColor:'#00e5ff88',borderColor:'#00e5ff',borderWidth:2,borderRadius:4},
+      {label:'The OGs',data:D.og_monthly.map(x=>x.c),backgroundColor:'#ff2d9588',borderColor:'#ff2d95',borderWidth:2,borderRadius:4}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e0e0ff',usePointStyle:true,pointStyle:'rect'}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'}},x:{grid:{display:false}}}}});
+})();
+
+// ── TARGET BARS ──
+function buildTargetBars(data,containerId,max,color){
+  const container=document.getElementById(containerId);
+  container.innerHTML=data.map(p=>{
+    const pct=Math.min(100,Math.round((p.t/max)*100));
+    return `<div class="xp-bar-wrap">
+      <div class="xp-label"><span class="xp-name">${p.n.split(' ').slice(0,2).join(' ')}</span><span class="xp-val">${p.t}</span></div>
+      <div class="xp-bar"><div class="xp-fill" style="width:${pct}%;background:linear-gradient(90deg,${color},${color}88)"></div></div>
+    </div>`;
+  }).join('');
+}
+buildTargetBars(D.monthly_sales_targets,'monthlyTargetBars',90,'#00e5ff');
+buildTargetBars(D.quarter_sales_targets,'quarterTargetBars',140,'#ff2d95');
+
+// ── QUARTER CHART ──
+(function(){
+  const ctx=document.getElementById('chartQuarter').getContext('2d');
+  new Chart(ctx,{type:'line',data:{
+    labels:D.quarters.map(x=>x.q),
+    datasets:[{
+      label:'Top Dogs Quarterly',data:D.quarters.map(x=>x.c),
+      borderColor:'#ffe600',backgroundColor:neonGradient(ctx,'#ffe60044','#ffe600'),
+      fill:true,tension:0.4,pointBackgroundColor:'#ffe600',pointBorderWidth:0,pointRadius:7,borderWidth:3
+    }]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e0e0ff',usePointStyle:true}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'}},x:{grid:{display:false}}}}});
+})();
+
+// ── QUARTER STAT CARDS ──
+(function(){
+  document.getElementById('quarterCards').innerHTML=D.quarters.map((q,i)=>{
+    const prev=i>0?D.quarters[i-1].c:0;
+    const growth=prev>0?Math.round(((q.c-prev)/prev)*100):0;
+    return `<div class="stat-card fade-in">
+      <div class="stat-label">${q.q}</div>
+      <div class="stat-value">${q.c.toLocaleString()}</div>
+      <div class="stat-change up">${i>0?'+'+growth+'% growth':'Baseline'}</div>
+    </div>`;
+  }).join('');
+})();
+</script>
+</body>
+</html>
