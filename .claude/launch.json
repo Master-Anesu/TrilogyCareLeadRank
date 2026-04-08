@@ -4,8 +4,8 @@
     {
       "name": "slay-ranker-web",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8000"],
-      "port": 8000
+      "runtimeArgs": ["serve.py"],
+      "autoPort": true
     }
   ]
 }
